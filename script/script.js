@@ -4,7 +4,7 @@ let result = ''
 let currentOperator = ''
 let inputVal = ''
 
-//Mathematical operations
+//MATHEMATICAL OPERATORS
 //Addition operator
 function add(num1, num2) {return num1 + num2;}
 //Subtraction operator
@@ -13,14 +13,12 @@ function subtract(num1, num2) {
     return num1 - num2;
 }
 //Multiplication operator
-function multiply(num1, num2) {return num1 * num2;} //Multiply values
+function multiply(num1, num2) {return num1 * num2;}
 //Division operator
 function divide(num1, num2) {
     if(num2==0) return 'Error!'
-    answer = num1 / num2;
-    if(answer.toString().substring('.').length > 9) return answer.toFixed(9)
-    return answer
-} //Divide values
+    return num1 / num2;
+}
 
 
 //Perform an operation on values
@@ -40,7 +38,7 @@ function operate(num1, num2, operator){
         default:
                   result = 'Error!';
     }
-    return result;
+    return (result.toString().substring('.').length > 9) ? Number(result).toFixed(9) : result;
 }
 
 
@@ -76,18 +74,18 @@ for(let i = 0; i < operators.length; ++i){
             result = currentValue
             currentOperator = e.target.innerText
         }
-        decimalFlag = !decimalFlag
         currentValue = ''
         displayResult(result)
         inputVal += e.target.innerText
         updateScreen(inputVal)
+        if(!decimalFlag) decimalFlag = !decimalFlag
     })
 }
 
 //Equal to
 const equalTo = document.querySelector('#equals')
 equalTo.addEventListener('click', ()=>{
-    if(!currentOperator){
+    if(currentValue){
         result = operate(result, currentValue, currentOperator)
     }
     displayResult(result)
@@ -106,12 +104,12 @@ for(let i = 0; i < numbers.length; ++i){
 }
 
 let decimalFlag = true
+//Add a decimal to the current numbers
 const decimal = document.querySelector('#decimal')
 decimal.addEventListener('click', ()=>{
-    if(decimalFlag){
+    if(decimalFlag) {
         currentValue += '.'
-        inputVal += '.'
-        updateScreen(inputVal)
+        updateScreen((inputVal += '.'))
         decimalFlag = !decimalFlag
-    }else;
+    }
 })
