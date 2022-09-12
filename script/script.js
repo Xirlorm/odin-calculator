@@ -36,7 +36,7 @@ const operate = (num1, num2, operator) => {
         Number(result).toFixed(12) : result;
 }
 
-const update_screen = () => document.querySelector('.user-input').innerText = expression.join('');
+const update_screen = () => document.querySelector('.user-input').innerText = exp.join('');
 
 const display_result = value => document.querySelector('.result').innerText = value;
 
@@ -45,14 +45,13 @@ for (let btn of digitBtns) {
     btn.addEventListener( 'click', (event) => {
         const value = event.target.getAttribute('data-key');
 
-        if (expression.length < 1) expression.push(value);
+        if (exp.length < 1) exp.push(value);
         else {
-            const last_val = expression[expression.length - 1][0];
+            const lastVal = exp[exp.length - 1][0];
            
-            if (last_val == '+' || last_val == '-' || last_val == 'x' || last_val == '/')
-                expression.push(value);
-            else
-                expression[expression.length - 1] += value;
+            if (lastVal == '+' || lastVal == '-' || lastVal == 'x' || lastVal == '/')
+                exp.push(value);
+            else exp[exp.length - 1] += value;
         }
 
         update_screen();
@@ -60,17 +59,16 @@ for (let btn of digitBtns) {
 }
 
 // Add current value and operator to expression when an operator button is clicked
-const expression = [];
+const exp = [];
 const operators = document.getElementsByClassName('operator');
 for (let btn of operators) {
     btn.addEventListener('click', (event) => {
         const currentOperator = event.target.getAttribute('data-key');
-        const last_val = expression[expression.length - 1];
+        const lastVal = exp[exp.length - 1];
 
-        if (last_val == '+' || last_val == '-' || last_val == 'x' || last_val == '/')
-            expression[expression.length - 1] = currentOperator;
-        else
-            expression.push(currentOperator);
+        if (lastVal == '+' || lastVal == '-' || lastVal == 'x' || lastVal == '/')
+            exp[exp.length - 1] = currentOperator;
+        else exp.push(currentOperator);
 
         decimalFlag = false;
         update_screen();
@@ -81,12 +79,10 @@ for (let btn of operators) {
 let decimalFlag = false; // Decimal switch
 document.getElementById('decimal') .addEventListener('click',
     () => {
-        const lastExprssn = expression[expression.length - 1];
+        const lastVal = exp[exp.length - 1];
 
-        if (lastExprssn != "+" && lastExprssn != "-" &&
-            lastExprssn != "/" && lastExprssn != "x") 
-            if (!lastExprssn.includes("."))
-                expression[expression.length - 1] += ".";
+        if (!isNaN(Number(lastVal)))
+            if (!lastVal.includes(".")) exp[exp.length - 1] += ".";
 
         update_screen();
     }
@@ -95,7 +91,7 @@ document.getElementById('decimal') .addEventListener('click',
 // Clear current expression
 document.getElementById('clear').addEventListener('click',
     () => {
-        expression.length = 0;
+        exp.length = 0;
         update_screen();
         display_result('');
     }
@@ -104,12 +100,12 @@ document.getElementById('clear').addEventListener('click',
 // Delete previous input
 document.getElementById('delete').addEventListener('click',
     () => {
-        if (expression[expression.length - 1].length < 2) {
-            expression.pop();
+        if (exp[exp.length - 1].length < 2) {
+            exp.pop();
         } else {
-            let val = expression.pop();
+            let val = exp.pop();
             val = val.slice(0, val.length -1);
-            expression.push(val);
+            exp.push(val);
         }
 
         update_screen();
@@ -124,32 +120,54 @@ document.getElementById('equals').addEventListener('click',
     }
 );
 
-
+// Caculator logic
 function calculate() {
-    let result = 0;
+    const solvedExp = Array(...exp);
 
-    if (expression[0] == '÷' || expression[0] == '×')
-        return "Math error!"
-    else {
-        for (let i = 0; i < expression.length; i += 2) {
-            if (i == 0) {
-                if (expression[i] == '-'|| expression[i] == '+') {
-                    result = operate(
-                        expression[i + 1], undefined, expression[i]
-                    );
-                } else {
-                    result = operate(
-                        expression[i], expression[i + 2], expression[i + 1]
-                    );
-                    i++;
-                }
-                continue;
-            }
+    if (solvedExp[0] == '/' || solvedExp[solvedExp.length - 1] == '/') return 'Math Error!';
+    if (solvedExp[0] == 'x' || solvedExp[solvedExp.length - 1] == 'x') return 'Math Error!';
 
-            result = operate(
-                result, expression[i + 1], expression[i]
-            )
-        }
+    while (true) {
+        if (solvedExp.includes("x")) {
+            const index = solvedExp.indexOf("x");
+            const subExp = solvedExp.splice(index - 1, 3);
+            solvedExp.splice(
+                index - 1,
+                0, 
+                operate(subExp[0], subExp[2], subExp[1])
+            );
+        } else if (solvedExp.includes("/")) {
+            const index = solvedExp.indexOf("/");
+            const subExp = solvedExp.splice(index - 1, 3);
+            solvedExp.splice(
+                index - 1,
+                0, 
+                operate( subExp[0], subExp[2], subExp[1])
+            );
+        } else break;
     }
+
+    let result;
+    for (let i = 0; i < solvedExp.length; i += 2) {
+        if (i == 0) {
+            if (solvedExp[i] == '-'|| solvedExp[i] == '+') {
+                result = operate(
+                    solvedExp[i + 1],
+                    undefined,
+                    solvedExp[i]
+                );
+            } else {
+                result = operate(
+                    solvedExp[i],
+                    solvedExp[i + 2],
+                    solvedExp[i + 1]
+                );
+                i++;
+            }
+            continue;
+        }
+        result = operate(result, solvedExp[i + 1], solvedExp[i])
+    }
+    
     return result;
 }
