@@ -1,115 +1,155 @@
+/*
+ * A simple calculator project to put in practice what I've learnt
+ * on javascript, css and html so far.
+ * This project exhibits DOM manipulation and user interactivity.
+ */
 
-let currentValue = ''
-let result = ''
-let currentOperator = ''
-let inputVal = ''
+// MATHEMATICAL OPERATORS
 
-//MATHEMATICAL OPERATORS
-//Addition operator
-function add(num1, num2) {return num1 + num2;}
-//Subtraction operator
-function subtract(num1, num2) {
-    if(!num2) return -num2;
-    return num1 - num2;
-}
-//Multiplication operator
-function multiply(num1, num2) {return num1 * num2;}
-//Division operator
-function divide(num1, num2) {
-    if(num2==0) return 'Error!'
-    return num1 / num2;
-}
+// Addition operator
+const add = (num1, num2) => isNaN(num2) ? num1 : num1 + num2;
 
+// Subtraction operator
+const subtract = (num1, num2) => isNaN(num2) ? -num1 : num1 - num2;
+
+// Multiplication operator
+const multiply = (num1, num2) => isNaN(num2) ? 'Math error' : num1 * num2;
+
+// Division operator
+const divide = (num1, num2) => isNaN(num2) ? 'Math error' : (num1 / num2);
 
 //Perform an operation on values
-function operate(num1, num2, operator){
+const operate = (num1, num2, operator) => {
     num1 = Number(num1);
     num2 = Number(num2);
-    if(isNaN(num1)) return 'Error!'
-    switch(operator){
-        case '+': result = add(num1, num2);
-                  break;
-        case '-': result = subtract(num1, num2);
-                  break;
-        case '×': result = multiply(num1, num2);
-                  break;
-        case '÷': result = divide(num1, num2);
-                  break;
-        default:
-                  result = 'Error!';
+
+    if (operator == undefined && isNaN(num2)) return num1;
+
+    switch (operator) {
+        case '+': result = add(num1, num2); break;
+        case '-': result = subtract(num1, num2); break;
+        case 'x': result = multiply(num1, num2); break;
+        case '/': result = divide(num1, num2); break;
     }
-    return (result.toString().substring('.').length > 9) ? Number(result).toFixed(9) : result;
+
+    return (result.toString().substring('.').length > 12) ?
+        Number(result).toFixed(12) : result;
 }
 
+const update_screen = () => document.querySelector('.user-input').innerText = expression.join('');
 
-//Clear Screen
-const clearScreen = document.querySelector('#clear-screen')
-clearScreen.addEventListener('click', () => {
-    currentValue = ''
-    result = ''
-    currentOperator = ''
-    inputVal = ''
-    updateScreen(0)
-    displayResult(result)
-})
+const display_result = value => document.querySelector('.result').innerText = value;
 
-//Update screen
-function updateScreen(value){
-    document.querySelector('.valInput').innerText = value
-}
+const digitBtns = document.getElementsByClassName('digit');
+for (let btn of digitBtns) {
+    btn.addEventListener( 'click', (event) => {
+        const value = event.target.getAttribute('data-key');
 
-//Show Result
-function displayResult(value){
-    document.querySelector('.result').innerText = value
-}
-
-//Set operator
-const operators = document.querySelectorAll('.operator')
-for(let i = 0; i < operators.length; ++i){
-    operators[i].addEventListener('click', (e)=>{
-        if(currentOperator){
-            result = operate(result, currentValue, currentOperator)
-            currentOperator = e.target.innerText
-        }else{
-            result = currentValue
-            currentOperator = e.target.innerText
+        if (expression.length < 1) expression.push(value);
+        else {
+            const last_val = expression[expression.length - 1][0];
+           
+            if (last_val == '+' || last_val == '-' || last_val == 'x' || last_val == '/')
+                expression.push(value);
+            else
+                expression[expression.length - 1] += value;
         }
-        currentValue = ''
-        displayResult(result)
-        inputVal += e.target.innerText
-        updateScreen(inputVal)
-        if(!decimalFlag) decimalFlag = !decimalFlag
-    })
+
+        update_screen();
+    });
 }
 
-//Equal to
-const equalTo = document.querySelector('#equals')
-equalTo.addEventListener('click', ()=>{
-    if(currentValue){
-        result = operate(result, currentValue, currentOperator)
-    }
-    displayResult(result)
-    currentOperator = ''
-    inputVal = ''
-})
+// Add current value and operator to expression when an operator button is clicked
+const expression = [];
+const operators = document.getElementsByClassName('operator');
+for (let btn of operators) {
+    btn.addEventListener('click', (event) => {
+        const currentOperator = event.target.getAttribute('data-key');
+        const last_val = expression[expression.length - 1];
 
-//Number button
-const numbers = document.querySelectorAll('.digit')
-for(let i = 0; i < numbers.length; ++i){
-    numbers[i].addEventListener('click', (e)=>{
-        currentValue += e.target.innerText
-        inputVal += e.target.innerText
-        updateScreen(inputVal)
-    })
+        if (last_val == '+' || last_val == '-' || last_val == 'x' || last_val == '/')
+            expression[expression.length - 1] = currentOperator;
+        else
+            expression.push(currentOperator);
+
+        decimalFlag = false;
+        update_screen();
+    });
 }
 
-let decimalFlag = true
-//Add a decimal to the current numbers
-const decimal = document.querySelector('#decimal')
-decimal.addEventListener('click', ()=>{
-    if(decimalFlag) {
-        currentValue += '.'
-        updateScreen((inputVal += '.'))
-        decimalFlag = !decimalFlag
+// Allow only single decimals for each number
+let decimalFlag = false; // Decimal switch
+document.getElementById('decimal') .addEventListener('click',
+    () => {
+        const lastExprssn = expression[expression.length - 1];
+
+        if (lastExprssn != "+" && lastExprssn != "-" &&
+            lastExprssn != "/" && lastExprssn != "x") 
+            if (!lastExprssn.includes("."))
+                expression[expression.length - 1] += ".";
+
+        update_screen();
     }
-})
+);
+
+// Clear current expression
+document.getElementById('clear').addEventListener('click',
+    () => {
+        expression.length = 0;
+        update_screen();
+        display_result('');
+    }
+);
+
+// Delete previous input
+document.getElementById('delete').addEventListener('click',
+    () => {
+        if (expression[expression.length - 1].length < 2) {
+            expression.pop();
+        } else {
+            let val = expression.pop();
+            val = val.slice(0, val.length -1);
+            expression.push(val);
+        }
+
+        update_screen();
+        display_result('');
+    }
+);
+
+// Show user result of current expression
+document.getElementById('equals').addEventListener('click',
+    () => {
+        display_result(calculate());
+    }
+);
+
+
+function calculate() {
+    let result = 0;
+
+    if (expression[0] == '÷' || expression[0] == '×')
+        return "Math error!"
+    else {
+        for (let i = 0; i < expression.length; i += 2) {
+            if (i == 0) {
+                if (expression[i] == '-'|| expression[i] == '+') {
+                    result = operate(
+                        expression[i + 1], undefined, expression[i]
+                    );
+                } else {
+                    result = operate(
+                        expression[i], expression[i + 2], expression[i + 1]
+                    );
+                    i++;
+                }
+                continue;
+            }
+
+            result = operate(
+                result, expression[i + 1], expression[i]
+            )
+        }
+    }
+    return result;
+}

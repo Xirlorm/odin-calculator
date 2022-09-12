@@ -9,30 +9,31 @@
     </head>
     <body>
         <main>
-            <div class="display">
-                <div class="valInput">0</div>
+            <div id="display">
+                <div class="user-input"></div>
                 <div class="result"></div>
             </div>
             <div class="controls">
-                <div class="input">
-                    <button class="digit">1</button>
-                    <button class="digit">2</button>
-                    <button class="digit">3</button>
-                    <button class="digit">4</button>
-                    <button class="digit">5</button>
-                    <button class="digit">6</button>
-                    <button class="digit">7</button>
-                    <button class="digit">8</button>
-                    <button class="digit">9</button>
-                    <button class="digit">0</button>
-                    <button class="operator" id="plus">+</button>
-                    <button class="operator" id="minus">-</button>
-                    <button class="operator" id="multiply">×</button>
-                    <button class="operator" id="divide">÷</button>
-                    <button class="operator" id="equals">=</button>
-                    <button id="decimal">.</button>
-                    <button id="clear-screen">A/C</button>
-                </div>
+                <button class="digit" data-key="1">1</button>
+                <button class="digit" data-key="2">2</button>
+                <button class="digit" data-key="3">3</button>
+                <button class="digit" data-key="4">4</button>
+                <button class="digit" data-key="5">5</button>
+                <button class="digit" data-key="6">6</button>
+                <button class="digit" data-key="7">7</button>
+                <button class="digit" data-key="8">8</button>
+                <button class="digit" data-key="9">9</button>
+                <button class="digit" data-key="0">0</button>
+
+                <button class="operator" data-key="+" id="plus">+</button>
+                <button class="operator" data-key="-" id="minus">-</button>
+                <button class="operator" data-key="x" id="multiply">×</button>
+                <button class="operator" data-key="/" id="divide">÷</button>
+
+                <button id="equals">=</button>
+                <button id="decimal">.</button>
+                <button id="delete">DEL</button>
+                <button id="clear">A/C</button>
             </div>
         </main>
     </body>
