@@ -3,7 +3,7 @@ body {
     flex-direction: row;
     justify-content: center;
     align-content: center;
-    background-color: #fff;
+    background-color: #edeae3;
 }
 
 main {
@@ -18,7 +18,7 @@ main {
     box-shadow: -2px -2px 5px #ddd , 4px 4px 18px #535;
     /* box-shadow: inset 4px 2px 10px #979, inset -2px -2px 6px #868; */
     text-align: center;
-    background-color: #535;
+    background-color: #424953;
 }
 
 #display {
@@ -66,13 +66,18 @@ button {
     margin: 0.5px;
     border: solid 2px #646;
     border-radius: 8px;
-    background: #6a9;
+    /* background: #e69942; */
+    background-color: #5e9cea;
     color: #344;
     box-shadow: 3px 3px 5px #424;
 }
 
-.digit{ 
-    background: #cac;
+.digit { 
+    background: #aab2bd;
+}
+
+.operator {
+    background: #f6bb42;
 }
 
 button:active { 
