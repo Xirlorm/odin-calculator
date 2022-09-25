@@ -40,6 +40,7 @@ const update_screen = () => document.querySelector('.user-input').innerText = ex
 
 const display_result = value => document.querySelector('.result').innerText = value;
 
+// Enter a number value
 const digitBtns = document.getElementsByClassName('digit');
 for (let btn of digitBtns) {
     btn.addEventListener( 'click', (event) => {
@@ -49,9 +50,15 @@ for (let btn of digitBtns) {
         else {
             const lastVal = exp[exp.length - 1][0];
            
-            if (lastVal == '+' || lastVal == '-' || lastVal == 'x' || lastVal == '÷')
-                exp.push(value);
-            else exp[exp.length - 1] += value;
+            switch (lastVal) {
+                case '+':
+                case '-':
+                case 'x':
+                case '÷': exp.push(value);
+                          break;
+                default:
+                    exp[exp.length - 1] += value;
+            }
         }
 
         update_screen();
@@ -59,7 +66,7 @@ for (let btn of digitBtns) {
     });
 }
 
-// Add current value and operator to expression when an operator button is clicked
+// Perform math operation
 const exp = [];
 const operators = document.getElementsByClassName('operator');
 for (let btn of operators) {
@@ -67,23 +74,29 @@ for (let btn of operators) {
         const currentOperator = event.target.getAttribute('data-key');
         const lastVal = exp[exp.length - 1];
 
-        if (lastVal == '+' || lastVal == '-' || lastVal == 'x' || lastVal == '÷')
-            exp[exp.length - 1] = currentOperator;
-        else exp.push(currentOperator);
+        switch (lastVal) {
+            case '+':
+            case '-':
+            case '÷':
+            case 'x': exp[exp.length - 1] = currentOperator;
+                      break;
+            default: exp.push(currentOperator);
+        }
 
-        decimalFlag = false;
+        isFrctn = false;
         update_screen();
     });
 }
 
 // Allow only single decimals for each number
-let decimalFlag = false; // Decimal switch
-document.getElementById('decimal') .addEventListener('click',
+let isFrctn = false; // Decimal switch
+document.getElementById('decimal').addEventListener('click',
     () => {
         const lastVal = exp[exp.length - 1];
 
         if (!isNaN(Number(lastVal)))
-            if (!lastVal.includes('.')) exp[exp.length - 1] += '.';
+            if (!lastVal.includes('.'))
+                exp[exp.length - 1] += '.';
 
         update_screen();
     }
@@ -118,9 +131,15 @@ document.getElementById('delete').addEventListener('click',
 document.getElementById('equals').addEventListener('click',
     () => {
         display_result(calculate());
+
         const lastVal = exp[exp.length - 1];
-        if (lastVal != '+' && lastVal != '-' && lastVal != '÷' && lastVal != 'x')
-            exp.length = 0;
+
+        switch (lastVal) {
+            case '+':
+            case '-':
+            case '÷':
+            case 'x': exp.length = 0;
+        }
     }
 );
 
@@ -128,27 +147,29 @@ document.getElementById('equals').addEventListener('click',
 function calculate() {
     const solvedExp = Array(...exp);
 
-    if (solvedExp[0] == '÷' || solvedExp[solvedExp.length - 1] == '÷') return 'Math Error!';
-    if (solvedExp[0] == 'x' || solvedExp[solvedExp.length - 1] == 'x') return 'Math Error!';
-    if (solvedExp[solvedExp.length - 1] == '+' ||
-    solvedExp[solvedExp.length - 1] == '-') return 'Math Error!';
+    if (solvedExp.length < 1) return '0';
+
+    switch (solvedExp[0]) {
+        case '÷':
+        case 'x': return 'Math Error!';
+    }
+
+    switch (solvedExp[solvedExp.length - 1]) {
+        case '÷':
+        case 'x':
+        case '-':
+        case '+': return 'Math Error!';
+    }
 
     while (true) {
-        if (solvedExp.includes('x')) {
-            const index = solvedExp.indexOf('x');
+        if (solvedExp.includes('x') || solvedExp.includes('÷')) {
+            const index = solvedExp.includes('x') ?
+                solvedExp.indexOf('x') :
+                solvedExp.indexOf('÷');
             const subExp = solvedExp.splice(index - 1, 3);
             solvedExp.splice(
-                index - 1,
-                0, 
+                index - 1, 0, 
                 operate(subExp[0], subExp[2], subExp[1])
-            );
-        } else if (solvedExp.includes('÷')) {
-            const index = solvedExp.indexOf('÷');
-            const subExp = solvedExp.splice(index - 1, 3);
-            solvedExp.splice(
-                index - 1,
-                0, 
-                operate( subExp[0], subExp[2], subExp[1])
             );
         } else break;
     }
@@ -158,21 +179,17 @@ function calculate() {
         if (i == 0) {
             if (solvedExp[i] == '-'|| solvedExp[i] == '+') {
                 result = operate(
-                    solvedExp[i + 1],
-                    undefined,
-                    solvedExp[i]
+                    solvedExp[i + 1], undefined, solvedExp[i]
                 );
             } else {
                 result = operate(
-                    solvedExp[i],
-                    solvedExp[i + 2],
-                    solvedExp[i + 1]
+                    solvedExp[i], solvedExp[i + 2], solvedExp[i + 1]
                 );
                 i++;
             }
             continue;
         }
-        result = operate(result, solvedExp[i + 1], solvedExp[i])
+        result = operate( result, solvedExp[i + 1], solvedExp[i] );
     }
     
     return result;
