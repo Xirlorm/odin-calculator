@@ -38,6 +38,12 @@ main {
     overflow-x: scroll;
     line-height: 31px;
     text-align: left;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+}
+
+.user-input::-webkit-scrollbar {
+	display: none;
 }
 
 .result{

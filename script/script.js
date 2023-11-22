@@ -36,7 +36,11 @@ const operate = (num1, num2, operator) => {
         Number(result).toFixed(12) : result;
 }
 
-const update_screen = () => document.querySelector('.user-input').innerText = exp.join('');
+const update_screen = () => {
+	const screen = document.querySelector('.user-input')
+	screen.innerText = exp.join('');
+	screen.scrollLeft = display.scrollWidth;
+}
 
 const display_result = value => document.querySelector('.result').innerText = value;
 
