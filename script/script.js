@@ -38,7 +38,7 @@ const operate = (num1, num2, operator) => {
 
 const update_screen = () => {
 	const screen = document.querySelector('.user-input')
-	screen.innerText = exp.join('');
+	screen.innerText = exp.length == 0 ? 0 : exp.join('');
 	screen.scrollLeft = display.scrollWidth;
 }
 
